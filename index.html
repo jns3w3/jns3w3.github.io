@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>babacle</title>
+  </head>
+  <body>
+    <form id="formulario">
+      <fieldset>
+        <legend>Trabalhe conosco</legend>
+        <label for="nome">Nome Completo:</label>
+        <input type="text" id="nome" name="nome" /><br />
+        <p>Vagas disponíveis</p>
+        <label
+          ><input type="radio" name="vaga" value="Dev Front-end JR" /> Dev
+          Front-end JR</label
+        >
+        <label
+          ><input type="radio" name="vaga" value="Designer UI/UX" /> Designer
+          UI/UX</label
+        >
+        <p>Habilidades</p>
+        <label
+          ><input type="checkbox" name="habilidades" value="HTML5" />
+          HTML5</label
+        >
+        <label
+          ><input type="checkbox" name="habilidades" value="Javascript" />
+          Javascript</label
+        >
+        <label
+          ><input type="checkbox" name="habilidades" value="Figma" />
+          Figma</label
+        >
+        <div>
+          <label for="id_textarea"
+            >Cursos:
+            <textarea
+              name="cursos_textarea"
+              id="id_textarea"
+              cols="30"
+              rows="4"
+            ></textarea>
+          </label>
+        </div>
+      </fieldset>
+      <button type="submit" id="enviar">Enviar</button>
+    </form>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-analytics.js";
+      import {
+        getDatabase,
+        ref,
+        push,
+      } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCHvVjCI-BVq_X8tTBHNaPn6PpZtA2gLgQ",
+        authDomain: "realtime-database-cd9d5.firebaseapp.com",
+        projectId: "realtime-database-cd9d5",
+        storageBucket: "realtime-database-cd9d5.appspot.com",
+        messagingSenderId: "1026240516555",
+        appId: "1:1026240516555:web:7c9e74d092147c6523264e",
+        measurementId: "G-Z1BPXJ1060",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const database = getDatabase();
+
+      let form = document.getElementById("formulario");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const nome = form["nome"].value;
+        const vaga = form.querySelector('input[name="vaga"]:checked');
+        const habilidades = Array.from(
+          form.querySelectorAll('input[name="habilidades"]:checked')
+        ).map(function (checkbox) {
+          return checkbox.value;
+        });
+        const curso = form["cursos_textarea"].value;
+
+        if (!nome || !vaga || habilidades.length === 0) {
+          alert("Por favor, preencha todos os campos obrigatórios.");
+          return;
+        }
+
+        alert(
+          `Nome: ${nome}\nVaga: ${vaga.value}\nHabilidades: ${habilidades.join(
+            ", "
+          )}\nCurso: ${curso}`
+        );
+
+        const usersRef = ref(database, "users");
+        push(usersRef, {
+          nome: nome,
+          vaga: vaga.value,
+          habilidades: habilidades,
+          curso: curso,
+        })
+          .then(() => {
+            console.log("Dados enviados com sucesso!");
+          })
+          .catch((error) => {
+            console.error("Erro ao enviar dados:", error);
+          });
+      });
+    </script>
+  </body>
+</html>
